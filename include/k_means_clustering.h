@@ -32,4 +32,4 @@ typedef struct cluster {
     size_t count;
 } cluster;
 
-cluster *k_means(observation[], size_t size, int k);
+cluster *k_means(observation observations[], size_t size, int k);
