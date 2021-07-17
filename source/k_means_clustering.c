@@ -24,6 +24,8 @@
 #include <float.h>
 #include <string.h>
 
+#define MIN_ERROR_DENOMINATOR_SIZE 10000
+
 int calculate_nearst(observation *observation, cluster clusters[], int k) {
     double min_distance = DBL_MAX;
     double distance = 0;
@@ -73,7 +75,7 @@ cluster *k_means(observation observations[], size_t size, int k) {
         }
 
         size_t changed = 0;
-        size_t min_error = size / 10000;
+        size_t min_error = size / MIN_ERROR_DENOMINATOR_SIZE;
 
         int temp = 0;
 
