@@ -5,21 +5,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void main() {
-    size_t size = 255L;
-    observation *observations = (observation *)malloc(sizeof(observation) * size);
+#define INITIAL_MEANS (int)10
+#define SIZE (size_t)255L
+#define MAX_RADIUS 10
 
-    for (int index = 0; index < size; index++) {
-        double radius = 10 * ((double)rand() / RAND_MAX);
+int main(int argc, char **argv) {
+    observation *observations = (observation *)malloc(sizeof(observation) * SIZE);
+
+    for (int index = 0; index < SIZE; index++) {
+        double radius = MAX_RADIUS * ((double)rand() / RAND_MAX);
         double angle = 2 * M_PI * ((double)rand() / RAND_MAX);
         observations[index].x = radius * cos(angle);
         observations[index].y = radius * sin(angle);
     }
 
-    int k = 10;
-    cluster *clusters = k_means(observations, size, k);
+    cluster *clusters = k_means(observations, SIZE, INITIAL_MEANS);
 
-    for (int index = 0; index < k; index++) {
+    for (int index = 0; index < INITIAL_MEANS; index++) {
         printf("Observations in cluster %i: %zu\n", index, clusters[index].count);
     }
 
