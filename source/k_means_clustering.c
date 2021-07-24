@@ -24,15 +24,22 @@
 #include <float.h>
 #include <string.h>
 
+#ifdef __STDC_LIB_EXT1__
+    #define E 1
+#endif
+#ifndef __STDC_LIB_EXT1__
+    #define E 2
+#endif
+
 #define MIN_ERROR_DENOMINATOR_SIZE 10000
 
-int calculate_nearst(observation *observation, cluster clusters[], int k) {
+size_t calculate_nearst(observation *observation, cluster clusters[], size_t k) {
     double min_distance = DBL_MAX;
     double distance = 0;
 
-    int nearest_index = -1;
+    size_t nearest_index = -1;
 
-    for (int index = 0; index < k; index++) {
+    for (size_t index = 0; index < k; index++) {
         distance = (clusters[index].x - observation->x) * (clusters[index].x - observation->x) +
                    (clusters[index].y - observation->y) * (clusters[index].y - observation->y);
 
@@ -59,7 +66,7 @@ void calculate_centroid(observation observations[], size_t size, cluster *centro
     centroid->y /= centroid->count;
 }
 
-cluster *k_means(observation observations[], size_t size, int k) {
+cluster *k_means(observation observations[], size_t size, size_t k) {
     cluster *clusters = NULL;
 
     if (k <= 1) {
@@ -71,16 +78,16 @@ cluster *k_means(observation observations[], size_t size, int k) {
         memset(clusters, 0, k * sizeof(cluster));
 
         for (size_t index = 0; index < size; index++) {
-            observations[index].group = rand() % k;
+            observations[index].group = rand() % k; // NOLINT(cert-msc30-c, cert-msc50-cpp)
         }
 
         size_t changed = 0;
         size_t min_error = size / MIN_ERROR_DENOMINATOR_SIZE;
 
-        int temp = 0;
+        size_t temp = 0;
 
         do {
-            for (int index = 0; index < k; index++) {
+            for (size_t index = 0; index < k; index++) {
                 clusters[index].x = 0;
                 clusters[index].y = 0;
                 clusters[index].count = 0;
@@ -93,7 +100,7 @@ cluster *k_means(observation observations[], size_t size, int k) {
                 clusters[temp].count++;
             }
 
-            for (int index = 0; index < k; index++) {
+            for (size_t index = 0; index < k; index++) {
                 clusters[index].x /= clusters[index].count;
                 clusters[index].y /= clusters[index].count;
             }
@@ -110,7 +117,7 @@ cluster *k_means(observation observations[], size_t size, int k) {
     } else {
         clusters = (cluster *)malloc(sizeof(cluster) * k);
         memset(clusters, 0, k * sizeof(cluster));
-        for (int index = 0; index < size; index++) {
+        for (size_t index = 0; index < size; index++) {
             clusters[index].x = observations[index].x;
             clusters[index].y = observations[index].y;
             clusters[index].count = 1;
