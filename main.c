@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 #define INITIAL_MEANS (int)10
-#define SIZE (size_t)255L
+#define SIZE (size_t)255
 #define MAX_RADIUS 10
 
 int main(int argc, char **argv) {
