@@ -17,73 +17,84 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import ctypes
 import sys
-from typing import List
+from ctypes import *
+from typing import *
 
-import numpy
+from numpy import ndarray
+from numpy import issubdtype
+from numpy import number, integer
+from pandas import DataFrame
 
 try:
-    lib = ctypes.CDLL(f"build/kmeans_{sys.platform}.so")
+    lib = CDLL(f"build/kmeans_{sys.platform}.so")
 except BaseException:
     print(f"OS {sys.platform} not recognized")
 
 
-class observation(ctypes.Structure):
+class observation(Structure):
     _fields_ = [
-        ("x", ctypes.c_double),
-        ("y", ctypes.c_double),
-        ("group", ctypes.c_int),
+        ("x", c_double),
+        ("y", c_double),
+        ("group", c_size_t),
     ]
 
 
-class cluster(ctypes.Structure):
+class cluster(Structure):
     _fields_ = [
-        ("x", ctypes.c_double),
-        ("y", ctypes.c_double),
-        ("count", ctypes.c_size_t)
+        ("x", c_double),
+        ("y", c_double),
+        ("count", c_size_t)
     ]
 
 
-# TODO: return and accept numpy arrays?
-lib.k_means.restype = ctypes.POINTER(cluster)  # None
+lib.k_means.restype = POINTER(cluster)
 
 
-def k_means(observations: numpy.ndarray, k: int) -> List[cluster]:
-    """Generate a K-means cluster from observations.
+def k_means(observations: DataFrame, k: Optional[integer] = 5) -> DataFrame:
 
-    Parameters
-    ----------
-    observations : (N, 3) array_like
-        Observations in format (x, y, group).
-    k : int
-        Number of clusters to partition observations into.
+    if not isinstance(observations, DataFrame):
+        raise TypeError("Observations must be a pandas.Dataframe.")
 
-    Returns
-    -------
-    List[cluster]
-        [description]
-    """
+    if observations.shape[-1] != 3:
+        raise ValueError(
+            "Observation doesn't have the correct number of columns.")
 
-    o = []
-    for index, (x, y, group) in enumerate(observations):
-        x, y, group = float(x), float(y), int(group)
+    # Expected dtypes of the observations DataFrame
+    expected = (number, number, integer)
 
-        o.append(
-            observation(
-                ctypes.c_double(x),
-                ctypes.c_double(y),
-                ctypes.c_int(group)
-            )
-        )
+    # Check if the dtypes of observations corresponds to the expectation
+    result = map(issubdtype, observations.dtypes, expected)
 
-    return lib.k_means(
-        ctypes.Array(o),
-        ctypes.ctypes.c_size_t(len(observations)),
-        ctypes.c_int(k)
-    )
+    if not all(result):
+        raise ValueError(
+            "Observations doesn't have the correct dtype composition.")
 
+    # Unpack values
+    x = observations.iloc[:, 0].to_list()
+    y = observations.iloc[:, 1].to_list()
+    group = observations.iloc[:, 2].to_list()
 
-arr = numpy.zeros([100, 3], dtype=numpy.float)
+    # Create a Python list of observations
+    pyObservations = map(observation, x, y, group)
 
-k_means(arr, 5)
+    # Convert the Python list into a c-array
+    cObservations = (observation * len(x))(*pyObservations)
+
+    # Get c-array of cluster
+    cClusters = lib.k_means(cObservations, c_size_t(len(x)), c_size_t(k))
+
+    # Convert c-array of clusters into a python list
+    pyClusters = [cClusters[index] for index in range(len(x))]
+
+    # Split clusters
+    x, y, count = [], [], []
+    for obj in pyClusters:
+        x.append(obj.x)
+        y.append(obj.y)
+        count.append(obj.count)
+
+    # Pack into DataFrame and return
+    return DataFrame(
+        {"x": x, "y": y, "count": count},
+        columns=["x", "y", "count"])
