@@ -24,7 +24,7 @@
 
 typedef struct observation {
     double x, y;
-    int group;
+    size_t group;
 } observation;
 
 typedef struct cluster {
@@ -32,4 +32,4 @@ typedef struct cluster {
     size_t count;
 } cluster;
 
-cluster *k_means(observation observations[], size_t size, int k);
+cluster *k_means(observation observations[], size_t size, size_t k);

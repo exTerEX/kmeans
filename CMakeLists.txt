@@ -1,15 +1,8 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
-project(
-  kmeans
-  LANGUAGES C)
+project(kmeans LANGUAGES C)
 
 find_library(MATH_LIBRARY m REQUIRED)
-
-# syntax / format fix
-if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-  set(CMAKE_C_CLANG_TIDY clang-tidy -header-filter=. -checks=*)
-endif()
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
