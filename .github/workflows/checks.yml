@@ -76,4 +76,8 @@ jobs:
 
       - name: Test syntax
         run: |
-          python -m cmake-format --check .
+          if [[ $(python -m cmake-format --check **/CMakeLists.txt) ]];
+          then
+            echo "Code isn't following the syntax convention of this project."
+            exit 1
+          fi
