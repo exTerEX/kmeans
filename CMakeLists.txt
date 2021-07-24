@@ -25,12 +25,10 @@ set_target_properties(
              C_STANDARD 11)
 
 # executable
-add_executable(main main.c)
+add_executable(main examples/main.c)
 set_target_properties(main PROPERTIES LINKER_LANGUAGE C C_STANDARD 11)
 if(MATH_LIBRARY)
   target_link_libraries(main ${PROJECT_NAME} ${MATH_LIBRARY})
 endif()
 
 # python binaries
-
-# testing
