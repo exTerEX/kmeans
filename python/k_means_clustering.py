@@ -17,15 +17,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from random import randint
 import sys
 from ctypes import *
 from typing import *
 
+import numpy
 from numpy import ndarray
-from numpy import issubdtype
-from numpy import number, integer
-from pandas import DataFrame
 
 try:
     lib = CDLL(f"build/kmeans_{sys.platform}.so")
@@ -52,68 +49,88 @@ class cluster(Structure):
 lib.k_means.restype = POINTER(cluster)
 
 
-def k_means(observations: DataFrame, k: Optional[integer] = 5) -> DataFrame:
+def k_means(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarray]:
+    """Partition observations into k clusters.
 
-    if not isinstance(observations, DataFrame):
-        raise TypeError("Observations must be a pandas.Dataframe.")
+    Parameters
+    ----------
+    observations : ndarray, `shape (N, 2)`
+        An array of observations (x, y) to be clustered.
 
-    if observations.shape[-1] != 2:
-        raise ValueError(
-            "Observation doesn't have the correct number of columns.")
+        Data should be provided as: `[(x, y), (x, y), (x, y), ...]`
 
-    # Expected dtypes of the observations DataFrame
-    expected = (number, number)
+    k : int, optional
+        Amount of clusters to partition observations into, by default 5
 
-    # Check if the dtypes of observations corresponds to the expectation
-    result = map(issubdtype, observations.dtypes, expected)
+    Returns
+    -------
+    center : ndarray, `shape (k, 2)`
+        An array of positions to center of each cluster.
 
-    if not all(result):
-        raise ValueError("Observations can only contain numbers.")
+    count : ndarray, `shape (k, )`
+        Array of counts of datapoints closest to the center of its cluster.
 
-    # Unpack values
-    x = observations.iloc[:, 0].to_list()
-    y = observations.iloc[:, 1].to_list()
+    Examples
+    -------
+    >>> observations = [[6, 1], [-4, -4], [1, -7], [9, -2], [6, -6]]
+    >>> center, count = k_means(observations, k=2)
+    >>> center
+    [[-4, -4
+       5, -3]]
+    >>> count
+    [1, 4]
+    """
+    if not isinstance(observations, ndarray):
+        raise TypeError("Observations must be a ndarray.")
+
+    # Fix orientation on data
+    if observations.shape[-1] == 2:
+        observations = observations.T
+    else:
+        raise ValueError("Provided array should contain ((x, y), ) observations.")
+
+    # Find observation length
+    n = observations.shape[-1]
 
     # Create a Python list of observations
-    pyObservations = map(observation, x, y)
+    py_observations_list = map(observation, *observations)
 
     # Convert the Python list into a c-array
-    cObservations = (observation * len(x))(*pyObservations)
+    c_observations_array = (observation * n)(*py_observations_list)
 
     # Get c-array of cluster
-    cClusters = lib.k_means(cObservations, c_size_t(len(x)), c_size_t(k))
+    c_clusters_array = lib.k_means(
+        c_observations_array, c_size_t(n), c_size_t(k))
 
     # Convert c-array of clusters into a python list
-    pyClusters = [cClusters[index] for index in range(k)]
+    py_clusters_list = [c_clusters_array[index] for index in range(k)]
 
     # Split clusters
-    x, y, count = [], [], []
-    for obj in pyClusters:
-        x.append(obj.x)
-        y.append(obj.y)
-        count.append(obj.count)
+    center = numpy.zeros([k, 2], dtype=observations.dtype)
+    count = numpy.zeros(k, dtype=int)
+
+    for index, cluster_object in enumerate(py_clusters_list):
+        center[index][0] = cluster_object.x
+        center[index][1] = cluster_object.y
+        count[index] = cluster_object.count
 
     # Pack into DataFrame and return
-    return DataFrame(
-        {"x": x, "y": y, "count": count},
-        columns=["x", "y", "count"])
+    return (center, count)
 
 
 if __name__ == "__main__":
-    import random
-    import numpy
+    numpy.random.seed(1234)
 
-    random.seed(1234)
+    rand_list = numpy.random.random(100)
 
-    x, y = [], []
+    x = 10 * rand_list * numpy.cos(2 * numpy.pi * rand_list)
+    y = 10 * rand_list * numpy.sin(2 * numpy.pi * rand_list)
 
-    for index in range(0, 100):
-        radius = 10 * random.random()
-        angle = 2 * numpy.pi * random.random()
+    df = numpy.array([x, y]).T
 
-        x.append(radius * numpy.cos(angle))
-        y.append(radius * numpy.sin(angle))
+    print(f"Observations:\n{df[0:5]}\n...\n\nshape {len(df), len(df[0])}\n")
 
-    df = DataFrame({"x": x, "y": y})
+    centers, count = k_means(df, 7)
 
-    print(k_means(df, 5))
+    print(f"Centers:\n{centers}\n")
+    print(f"Count:\n{count}")
