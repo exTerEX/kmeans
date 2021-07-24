@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from random import randint
 import sys
 from ctypes import *
 from typing import *
@@ -56,27 +57,25 @@ def k_means(observations: DataFrame, k: Optional[integer] = 5) -> DataFrame:
     if not isinstance(observations, DataFrame):
         raise TypeError("Observations must be a pandas.Dataframe.")
 
-    if observations.shape[-1] != 3:
+    if observations.shape[-1] != 2:
         raise ValueError(
             "Observation doesn't have the correct number of columns.")
 
     # Expected dtypes of the observations DataFrame
-    expected = (number, number, integer)
+    expected = (number, number)
 
     # Check if the dtypes of observations corresponds to the expectation
     result = map(issubdtype, observations.dtypes, expected)
 
     if not all(result):
-        raise ValueError(
-            "Observations doesn't have the correct dtype composition.")
+        raise ValueError("Observations can only contain numbers.")
 
     # Unpack values
     x = observations.iloc[:, 0].to_list()
     y = observations.iloc[:, 1].to_list()
-    group = observations.iloc[:, 2].to_list()
 
     # Create a Python list of observations
-    pyObservations = map(observation, x, y, group)
+    pyObservations = map(observation, x, y)
 
     # Convert the Python list into a c-array
     cObservations = (observation * len(x))(*pyObservations)
@@ -85,7 +84,7 @@ def k_means(observations: DataFrame, k: Optional[integer] = 5) -> DataFrame:
     cClusters = lib.k_means(cObservations, c_size_t(len(x)), c_size_t(k))
 
     # Convert c-array of clusters into a python list
-    pyClusters = [cClusters[index] for index in range(len(x))]
+    pyClusters = [cClusters[index] for index in range(k)]
 
     # Split clusters
     x, y, count = [], [], []
@@ -98,3 +97,23 @@ def k_means(observations: DataFrame, k: Optional[integer] = 5) -> DataFrame:
     return DataFrame(
         {"x": x, "y": y, "count": count},
         columns=["x", "y", "count"])
+
+
+if __name__ == "__main__":
+    import random
+    import numpy
+
+    random.seed(1234)
+
+    x, y = [], []
+
+    for index in range(0, 100):
+        radius = 10 * random.random()
+        angle = 2 * numpy.pi * random.random()
+
+        x.append(radius * numpy.cos(angle))
+        y.append(radius * numpy.sin(angle))
+
+    df = DataFrame({"x": x, "y": y})
+
+    print(k_means(df, 5))
