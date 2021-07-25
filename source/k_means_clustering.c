@@ -19,15 +19,15 @@
 #include <string.h>
 
 #ifdef __STDC_LIB_EXT1__
-    #define E 1
+#define E 1
 #endif
 #ifndef __STDC_LIB_EXT1__
-    #define E 2
+#define E 2
 #endif
 
 #define MIN_ERROR_DENOMINATOR_SIZE 10000
 
-size_t calculate_nearst(observation *observation, cluster clusters[], size_t k) {
+size_t calculate_nearst(observation_t *observation, cluster_t clusters[], size_t k) {
     double min_distance = DBL_MAX;
     double distance = 0;
 
@@ -45,7 +45,7 @@ size_t calculate_nearst(observation *observation, cluster clusters[], size_t k) 
     return nearest_index;
 }
 
-void calculate_centroid(observation observations[], size_t size, cluster *centroid) {
+void calculate_centroid(observation_t observations[], size_t size, cluster_t *centroid) {
     centroid->x = 0;
     centroid->y = 0;
     centroid->count = size;
@@ -60,16 +60,16 @@ void calculate_centroid(observation observations[], size_t size, cluster *centro
     centroid->y /= centroid->count;
 }
 
-cluster *k_means(observation observations[], size_t size, size_t k) {
-    cluster *clusters = NULL;
+cluster_t *k_means(observation_t observations[], size_t size, size_t k) {
+    cluster_t *clusters = NULL;
 
     if (k <= 1) {
-        clusters = (cluster *)malloc(sizeof(cluster));
-        memset(clusters, 0, sizeof(cluster));
+        clusters = (cluster_t *)malloc(sizeof(cluster_t));
+        memset(clusters, 0, sizeof(cluster_t));
         calculate_centroid(observations, size, clusters);
     } else if (k < size) {
-        clusters = malloc(sizeof(cluster) * k);
-        memset(clusters, 0, k * sizeof(cluster));
+        clusters = malloc(sizeof(cluster_t) * k);
+        memset(clusters, 0, k * sizeof(cluster_t));
 
         for (size_t index = 0; index < size; index++) {
             observations[index].group = rand() % k; // NOLINT(cert-msc30-c, cert-msc50-cpp)
@@ -109,8 +109,8 @@ cluster *k_means(observation observations[], size_t size, size_t k) {
             }
         } while (changed > min_error);
     } else {
-        clusters = (cluster *)malloc(sizeof(cluster) * k);
-        memset(clusters, 0, k * sizeof(cluster));
+        clusters = (cluster_t *)malloc(sizeof(cluster_t) * k);
+        memset(clusters, 0, k * sizeof(cluster_t));
         for (size_t index = 0; index < size; index++) {
             clusters[index].x = observations[index].x;
             clusters[index].y = observations[index].y;
