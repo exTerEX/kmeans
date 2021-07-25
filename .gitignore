@@ -1,6 +1,9 @@
 ### CMake ###
 build/
 
+### Python ###
+**/__pycache__
+
 ### Code ###
 .vscode/*
 !.vscode/c_cpp_properties.json
