@@ -1,11 +1,5 @@
-/**
- * @file k_means_clustering.h
- * @author Andreas Sagen (developer@sagen.io)
- * @brief K-Means Clustering algorithm
- * @version 1.0.0
- * @date 2021-02-13
- *
- * @copyright Copyright 2021 Andreas Sagen
+/*
+ * Copyright 2021 Andreas Sagen
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
