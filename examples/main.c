@@ -10,7 +10,7 @@
 #define MAX_RADIUS 10
 
 int main(int argc, char **argv) {
-    observation *observations = (observation *)malloc(sizeof(observation) * SIZE);
+    observation_t *observations = (observation_t *)malloc(sizeof(observation_t) * SIZE);
 
     for (int index = 0; index < SIZE; index++) {
         double radius = MAX_RADIUS * ((double)rand() / RAND_MAX);
@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
         observations[index].y = radius * sin(angle);
     }
 
-    cluster *clusters = k_means(observations, SIZE, INITIAL_MEANS);
+    cluster_t *clusters = k_means(observations, SIZE, INITIAL_MEANS);
 
     for (int index = 0; index < INITIAL_MEANS; index++) {
         printf("Observations in cluster %i: %zu\n", index, clusters[index].count);

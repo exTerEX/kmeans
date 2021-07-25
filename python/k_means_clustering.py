@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
     print(f"Observations:\n{df[0:5]}\n...\n\nshape {len(df), len(df[0])}\n")
 
-    centers, count = k_means(df, 7)
+    centers, count = k_means(df, 3)
 
     print(f"Centers:\n{centers}\n")
     print(f"Count:\n{count}")
