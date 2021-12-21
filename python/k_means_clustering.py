@@ -2,8 +2,7 @@ import sys
 from ctypes import *
 from typing import *
 
-import numpy
-from numpy import ndarray
+from numpy import array, cos, ndarray, pi, random, sin, zeros
 
 try:
     lib = CDLL(f"build/kmeans_{sys.platform}.so")
@@ -30,7 +29,8 @@ class cluster(Structure):
 lib.k_means.restype = POINTER(cluster)
 
 
-def k_means(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarray]:
+def k_means(observations: ndarray,
+            k: Optional[int] = 5) -> Tuple[ndarray, ndarray]:
     """Partition observations into k clusters.
 
     Parameters
@@ -68,7 +68,8 @@ def k_means(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarr
     if observations.shape[-1] == 2:
         observations = observations.T
     else:
-        raise ValueError("Provided array should contain ((x, y), ) observations.")
+        raise ValueError(
+            "Provided array should contain ((x, y), ) observations.")
 
     # Find observation length
     n = observations.shape[-1]
@@ -87,8 +88,8 @@ def k_means(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarr
     py_clusters_list = [c_clusters_array[index] for index in range(k)]
 
     # Split clusters
-    center = numpy.zeros([k, 2], dtype=observations.dtype)
-    count = numpy.zeros(k, dtype=int)
+    center = zeros([k, 2], dtype=observations.dtype)
+    count = zeros(k, dtype=int)
 
     for index, cluster_object in enumerate(py_clusters_list):
         center[index][0] = cluster_object.x
@@ -100,14 +101,14 @@ def k_means(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarr
 
 
 if __name__ == "__main__":
-    numpy.random.seed(1234)
+    random.seed(1234)
 
-    rand_list = numpy.random.random(100)
+    rand_list = random.random(100)
 
-    x = 10 * rand_list * numpy.cos(2 * numpy.pi * rand_list)
-    y = 10 * rand_list * numpy.sin(2 * numpy.pi * rand_list)
+    x = 10 * rand_list * cos(2 * pi * rand_list)
+    y = 10 * rand_list * sin(2 * pi * rand_list)
 
-    df = numpy.array([x, y]).T
+    df = array([x, y]).T
 
     print(f"Observations:\n{df[0:5]}\n...\n\nshape {len(df), len(df[0])}\n")
 
