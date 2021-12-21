@@ -1,6 +1,6 @@
 # K-Means Clustering
 
-A simple C implementation of K-Means clustering.
+A simple C implementation of K-Means clustering with bindings to Python and R.
 
 ## LICENSE
 
