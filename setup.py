@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import os
 import pathlib
-from setuptools import setup, Extension
-from setuptools.command.build_ext import build_ext  # as build_ext_orig
+
+from setuptools import Extension, find_packages, setup
+from setuptools.command.build_ext import build_ext
 
 
 class CMakeExtension(Extension):
@@ -43,13 +44,23 @@ class build_ext(build_ext):
         os.chdir(str(cwd))
 
 
+with open("README.md", "r", encoding="utf-8") as file:
+    long_description = file.read()
+
+
 if __name__ == "__main__":
     setup(
         name="kmeans",
         version="0.1.0",
-        packages=["kmeans"],
+        license="LGPL-3.0-or-later",
+        author="Andreas Sagen",
+        description="A kmeans clustering algorithm implemented in C",
+        long_description=long_description,
+        long_description_content_type="text/markdown",
+        packages=find_packages(where="kmeans"),
         ext_modules=[CMakeExtension("kmeans/k_means_clustering")],
         cmdclass={
-            "build_ext": build_ext,
-        }
+            "build_ext": build_ext
+        },
+        python_requires=">=3.6"
     )
