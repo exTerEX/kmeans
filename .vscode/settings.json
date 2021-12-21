@@ -1,0 +1,6 @@
+{
+    "python.sortImports.args": [
+        "--py=310",
+        "--skip-gitignore"
+    ]
+}
