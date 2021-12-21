@@ -13,7 +13,7 @@ string(TOLOWER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
 include_directories(include)
 
 # library
-add_library(${PROJECT_NAME} SHARED source/k_means_clustering.c)
+add_library(${PROJECT_NAME} SHARED kmeans/k_means_clustering.c)
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
                          $<INSTALL_INTERFACE:include>)
@@ -25,10 +25,12 @@ set_target_properties(
              C_STANDARD 11)
 
 # executable
-add_executable(main examples/main.c)
-set_target_properties(main PROPERTIES LINKER_LANGUAGE C C_STANDARD 11)
-if(MATH_LIBRARY)
-  target_link_libraries(main ${PROJECT_NAME} ${MATH_LIBRARY})
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  add_executable(main examples/main.c)
+  set_target_properties(main PROPERTIES LINKER_LANGUAGE C C_STANDARD 11)
+  if(MATH_LIBRARY)
+    target_link_libraries(main ${PROJECT_NAME} ${MATH_LIBRARY})
+  endif()
 endif()
 
 # python binaries
