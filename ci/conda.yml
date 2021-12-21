@@ -1,0 +1,14 @@
+name: kmeans
+channels:
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - isort
+  - pydocstyle
+  - pycodestyle
+  - autopep8
+  - pylint
