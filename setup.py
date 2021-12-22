@@ -12,7 +12,6 @@ class CMakeExtension(Extension):
 
 
 class build_ext(build_ext):
-
     def run(self):
         for ext in self.extensions:
             self.build_cmake(ext)
@@ -28,14 +27,10 @@ class build_ext(build_ext):
 
         config = "Debug" if self.debug else "Release"
         cmake_args = [
-            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" +
-            str(extdir.parent.absolute()),
+            "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + str(extdir.parent.absolute()),
             "-DCMAKE_BUILD_TYPE=" + config]
 
-        build_args = [
-            "--config", config,
-            "--", "-j4"
-        ]
+        build_args = ["--config", config, "--", "-j4"]
 
         os.chdir(str(build_temp))
         self.spawn(["cmake", str(cwd)] + cmake_args)
@@ -59,8 +54,6 @@ if __name__ == "__main__":
         long_description_content_type="text/markdown",
         packages=find_packages(where="kmeans"),
         ext_modules=[CMakeExtension("kmeans/k_means_clustering")],
-        cmdclass={
-            "build_ext": build_ext
-        },
+        cmdclass={"build_ext": build_ext},
         python_requires=">=3.6"
     )

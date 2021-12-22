@@ -11,26 +11,17 @@ except BaseException:
 
 
 class observation(Structure):
-    _fields_ = [
-        ("x", c_double),
-        ("y", c_double),
-        ("group", c_size_t),
-    ]
+    _fields_ = [("x", c_double), ("y", c_double), ("group", c_size_t)]
 
 
 class cluster(Structure):
-    _fields_ = [
-        ("x", c_double),
-        ("y", c_double),
-        ("count", c_size_t)
-    ]
+    _fields_ = [("x", c_double), ("y", c_double), ("count", c_size_t)]
 
 
 lib.k_means.restype = POINTER(cluster)
 
 
-def k_means(observations: ndarray,
-            k: Optional[int] = 5) -> Tuple[ndarray, ndarray]:
+def k_means(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarray]:
     """Partition observations into k clusters.
 
     Parameters

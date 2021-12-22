@@ -1,4 +1,13 @@
 {
+    "files.exclude": {
+        "**/.git": true,
+        "**/*.egg-info": true
+    },
+    "python.formatting.autopep8Args": [
+        "--aggressive",
+        "--experimental",
+        "--max-line-length=99"
+    ],
     "python.sortImports.args": [
         "--py=310",
         "--skip-gitignore"
