@@ -12,3 +12,7 @@ dependencies:
   - pycodestyle
   - autopep8
   - pylint
+  - r-base
+  - r-essentials
+  - r-devtools
+  - r-rcpp
