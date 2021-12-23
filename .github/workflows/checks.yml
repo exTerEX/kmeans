@@ -1,4 +1,4 @@
-name: Code Check
+name: 🧹 Format Code Base
 
 on:
   pull_request:
