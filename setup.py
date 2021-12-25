@@ -52,7 +52,7 @@ if __name__ == "__main__":
         description="A kmeans clustering algorithm implemented in C",
         long_description=long_description,
         long_description_content_type="text/markdown",
-        packages=find_packages(where="lib/kmeans"),
+        packages=find_packages(where="lib/python/kmeans"),
         ext_modules=[CMakeExtension("kmeans/kmeans")],
         cmdclass={"build_ext": build_ext},
         python_requires=">=3.6"

@@ -5,7 +5,7 @@ from typing import *
 from numpy import array, cos, ndarray, pi, random, sin, zeros
 
 try:
-    lib = CDLL(f"build/kmeans_{sys.platform}.so")
+    lib = CDLL(f"kmeans_{sys.platform}.so")
 except BaseException:
     print(f"OS {sys.platform} not recognized")
 
