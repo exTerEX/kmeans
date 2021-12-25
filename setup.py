@@ -53,7 +53,7 @@ if __name__ == "__main__":
         long_description=long_description,
         long_description_content_type="text/markdown",
         packages=find_packages(where="kmeans"),
-        ext_modules=[CMakeExtension("kmeans/k_means_clustering")],
+        ext_modules=[CMakeExtension("kmeans/kmeans")],
         cmdclass={"build_ext": build_ext},
         python_requires=">=3.6"
     )

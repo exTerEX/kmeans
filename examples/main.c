@@ -1,4 +1,4 @@
-#include "k_means_clustering.h"
+#include "kmeans.h"
 
 #include <math.h>
 #include <stdint.h>
