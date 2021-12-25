@@ -11,7 +11,7 @@
 
 #define MIN_ERROR_DENOMINATOR_SIZE 10000
 
-size_t calculate_nearst(observation_2d_t *observation, cluster_2d_t clusters[], size_t k) {
+static size_t calculate_nearst(observation_2d_t *observation, cluster_2d_t clusters[], size_t k) {
   double min_distance = DBL_MAX;
   double distance = 0;
 
@@ -29,7 +29,8 @@ size_t calculate_nearst(observation_2d_t *observation, cluster_2d_t clusters[], 
   return nearest_index;
 }
 
-void calculate_centroid(observation_2d_t observations[], size_t size, cluster_2d_t *centroid) {
+static void calculate_centroid(observation_2d_t observations[], size_t size,
+                               cluster_2d_t *centroid) {
   centroid->x = 0;
   centroid->y = 0;
   centroid->count = size;

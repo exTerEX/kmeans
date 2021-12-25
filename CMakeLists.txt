@@ -13,7 +13,7 @@ string(TOLOWER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
 include_directories(include)
 
 # library
-add_library(${PROJECT_NAME} SHARED kmeans/kmeans_2d.c)# kmeans/kmeans_3d.c)
+add_library(${PROJECT_NAME} SHARED kmeans/core/2d.c kmeans/core/3d.c)
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
                          $<INSTALL_INTERFACE:include>)
