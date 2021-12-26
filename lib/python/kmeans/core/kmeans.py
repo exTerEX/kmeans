@@ -1,13 +1,12 @@
-import sys
 from ctypes import *
 from typing import *
 
 from numpy import array, cos, ndarray, pi, random, sin, zeros
 
 try:
-    lib = CDLL(f"kmeans_{sys.platform}.so")
+    lib = CDLL(f"libkmeans.so")
 except BaseException:
-    print(f"OS {sys.platform} not recognized")
+    print(f"Cannot load DLL")
 
 
 class observation_2d(Structure):
