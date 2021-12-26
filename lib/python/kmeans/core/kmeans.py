@@ -5,8 +5,9 @@ from numpy import array, cos, ndarray, pi, random, sin, zeros
 
 try:
     lib = CDLL(f"libkmeans.so")
-except BaseException:
+except Exception as E:
     print(f"Cannot load DLL")
+    print(E)
 
 
 class observation_2d(Structure):
