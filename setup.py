@@ -53,7 +53,10 @@ if __name__ == "__main__":
         long_description=long_description,
         long_description_content_type="text/markdown",
         packages=find_packages(where="lib/python/kmeans"),
-        ext_modules=[CMakeExtension("kmeans/kmeans")],
+        package_data={
+            "kmeans": ["libkmeans.so"]
+        },
+        ext_modules=[CMakeExtension("kmeans")],
         cmdclass={"build_ext": build_ext},
         python_requires=">=3.6"
     )
