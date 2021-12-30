@@ -49,7 +49,7 @@ static void calculate_centroid(observation_3d_t observations[], size_t size,
   centroid->z /= centroid->count;
 }
 
-cluster_3d_t *k_means_3d(observation_3d_t observations[], size_t size, size_t k) {
+cluster_3d_t *kmeans_3d(observation_3d_t observations[], size_t size, size_t k) {
   cluster_3d_t *clusters = NULL;
 
   if (k <= 1) {

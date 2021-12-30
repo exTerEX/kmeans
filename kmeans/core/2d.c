@@ -45,7 +45,7 @@ static void calculate_centroid(observation_2d_t observations[], size_t size,
   centroid->y /= centroid->count;
 }
 
-cluster_2d_t *k_means_2d(observation_2d_t observations[], size_t size, size_t k) {
+cluster_2d_t *kmeans_2d(observation_2d_t observations[], size_t size, size_t k) {
   cluster_2d_t *clusters = NULL;
 
   if (k <= 1) {
@@ -108,6 +108,6 @@ cluster_2d_t *k_means_2d(observation_2d_t observations[], size_t size, size_t k)
   return clusters;
 }
 
-cluster_t *k_means(observation_t observations[], size_t size, size_t k) {
-  return k_means_2d(observations, size, k);
+cluster_t *kmeans(observation_t observations[], size_t size, size_t k) {
+  return kmeans_2d(observations, size, k);
 }

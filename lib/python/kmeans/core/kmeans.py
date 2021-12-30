@@ -26,10 +26,10 @@ class cluster_3d(Structure):
     _fields_ = [("x", c_double), ("y", c_double), ("z", c_double), ("count", c_size_t)]
 
 
-lib.k_means_2d.restype = POINTER(cluster_2d)
+lib.kmeans_2d.restype = POINTER(cluster_2d)
 
 
-def k_means_2d(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarray]:
+def kmeans_2d(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarray]:
     """Partition observations into k clusters.
 
     Parameters
@@ -53,7 +53,7 @@ def k_means_2d(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, nd
     Examples
     -------
     >>> observations = [[6, 1], [-4, -4], [1, -7], [9, -2], [6, -6]]
-    >>> center, count = k_means_2d(observations, k=2)
+    >>> center, count = kmeans_2d(observations, k=2)
     >>> center
     [[-4, -4
        5, -3]]
@@ -79,7 +79,7 @@ def k_means_2d(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, nd
     c_observations_array = (observation_2d * n)(*py_observations_list)
 
     # Get c-array of cluster_2d
-    c_clusters_array = lib.k_means_2d(
+    c_clusters_array = lib.kmeans_2d(
         c_observations_array, c_size_t(n), c_size_t(k))
 
     # Convert c-array of clusters into a python list
@@ -98,10 +98,10 @@ def k_means_2d(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, nd
     return (center, count)
 
 
-lib.k_means_3d.restype = POINTER(cluster_3d)
+lib.kmeans_3d.restype = POINTER(cluster_3d)
 
 
-def k_means_3d(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarray]:
+def kmeans_3d(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarray]:
     """Partition observations into k clusters.
 
     Parameters
@@ -125,7 +125,7 @@ def k_means_3d(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, nd
     Examples
     -------
     >>> observations = [[6, 1, 3], [-4, -4, -4], [1, -7, 7], [9, -2, 1], [6, -6, 6]]
-    >>> center, count = k_means_3d(observations, k=2)
+    >>> center, count = kmeans_3d(observations, k=2)
     >>> center
     [[ -0.35830777  -7.41219447 201.90265473]
      [  1.83808572  -5.86460671 -28.00696338]
@@ -152,7 +152,7 @@ def k_means_3d(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, nd
     c_observations_array = (observation_3d * n)(*py_observations_list)
 
     # Get c-array of cluster_2d
-    c_clusters_array = lib.k_means_3d(c_observations_array, c_size_t(n), c_size_t(k))
+    c_clusters_array = lib.kmeans_3d(c_observations_array, c_size_t(n), c_size_t(k))
 
     # Convert c-array of clusters into a python list
     py_clusters_list = [c_clusters_array[index] for index in range(k)]
@@ -198,7 +198,7 @@ def kmeans(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarra
     Examples
     -------
     >>> observations = [[6, 1], [-4, -4], [1, -7], [9, -2], [6, -6]]
-    >>> center, count = k_means_2d(observations, k=2)
+    >>> center, count = kmeans_2d(observations, k=2)
     >>> center
     [[-4, -4
        5, -3]]
@@ -210,9 +210,9 @@ def kmeans(observations: ndarray, k: Optional[int] = 5) -> Tuple[ndarray, ndarra
         raise TypeError("Observations must be a ndarray.")
 
     if observations.shape[-1] == 3:
-        return k_means_3d(observations, k)
+        return kmeans_3d(observations, k)
     elif observations.shape[-1] == 2:
-        return k_means_2d(observations, k)
+        return kmeans_2d(observations, k)
     else:
         pass
 
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     print(f"Count:\n{count}")
 
     observations = [[6, 1], [-4, -4], [1, -7], [9, -2], [6, -6]]
-    center, count = k_means_2d(array(observations), k=2)
+    center, count = kmeans_2d(array(observations), k=2)
 
     print(f"Centers:\n{centers}\n")
     print(f"Count:\n{count}")
