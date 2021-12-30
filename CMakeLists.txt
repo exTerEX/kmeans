@@ -32,5 +32,3 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     target_link_libraries(main ${PROJECT_NAME} ${MATH_LIBRARY})
   endif ()
 endif ()
-
-# python binaries

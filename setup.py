@@ -58,5 +58,6 @@ if __name__ == "__main__":
         },
         ext_modules=[CMakeExtension("kmeans")],
         cmdclass={"build_ext": build_ext},
-        python_requires=">=3.6"
+        python_requires=">=3.6",
+        install_requires=["numpy"]
     )

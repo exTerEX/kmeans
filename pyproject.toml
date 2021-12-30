@@ -2,6 +2,9 @@
 requires = ["setuptools>=51.0.0", "wheel>=0.29.0"]
 build-backend = "setuptools.build_meta"
 
+[bdist_wheel]
+universal = 1
+
 [tool.pyright]
 exclude = ["**/__pycache__"]
 reportMissingImports = false
