@@ -1,10 +1,11 @@
 from ctypes import *
 from typing import *
+from pathlib import Path
 
 from numpy import array, cos, ndarray, pi, random, sin, zeros, tan
 
 try:
-    lib = CDLL(f"./libkmeans.so")
+    lib = cdll.LoadLibrary(str(Path(__file__).with_name("libkmeans.so")))
 except Exception as E:
     print(f"Cannot load DLL")
     print(E)
