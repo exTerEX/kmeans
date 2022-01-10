@@ -14,7 +14,7 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif ()
 
 # library
-add_library(${PROJECT_NAME} SHARED kmeans/core/2d.c kmeans/core/3d.c)
+add_library(${PROJECT_NAME} SHARED src/2d.c src/3d.c)
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
                          $<INSTALL_INTERFACE:include>)

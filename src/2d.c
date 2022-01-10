@@ -1,4 +1,4 @@
-#include "kmeans.h"
+#include "kmeans/kmeans.h"
 #include <float.h>
 #include <string.h>
 
@@ -11,18 +11,20 @@
 
 #define MIN_ERROR_DENOMINATOR_SIZE 10000
 
-static size_t calculate_nearst(observation_3d_t *observation, cluster_3d_t clusters[], size_t k) {
+static size_t calculate_nearst(observation_2d_t *observation, cluster_2d_t clusters[], size_t k)
+{
   double min_distance = DBL_MAX;
   double distance = 0;
 
   size_t nearest_index = -1;
 
-  for (size_t index = 0; index < k; index++) {
+  for (size_t index = 0; index < k; index++)
+  {
     distance = (clusters[index].x - observation->x) * (clusters[index].x - observation->x) +
-               (clusters[index].y - observation->y) * (clusters[index].y - observation->y) +
-               (clusters[index].z - observation->z) * (clusters[index].z - observation->z);
+               (clusters[index].y - observation->y) * (clusters[index].y - observation->y);
 
-    if (distance < min_distance) {
+    if (distance < min_distance)
+    {
       min_distance = distance;
       nearest_index = index;
     }
@@ -30,37 +32,40 @@ static size_t calculate_nearst(observation_3d_t *observation, cluster_3d_t clust
   return nearest_index;
 }
 
-static void calculate_centroid(observation_3d_t observations[], size_t size,
-                               cluster_3d_t *centroid) {
+static void calculate_centroid(observation_2d_t observations[], size_t size, cluster_2d_t *centroid)
+{
   centroid->x = 0;
   centroid->y = 0;
-  centroid->z = 0;
   centroid->count = size;
 
-  for (size_t index = 0; index < size; index++) {
+  for (size_t index = 0; index < size; index++)
+  {
     centroid->x += observations[index].x;
     centroid->y += observations[index].y;
-    centroid->z += observations[index].z;
     observations[index].group = 0;
   }
 
   centroid->x /= centroid->count;
   centroid->y /= centroid->count;
-  centroid->z /= centroid->count;
 }
 
-cluster_3d_t *kmeans_3d(observation_3d_t observations[], size_t size, size_t k) {
-  cluster_3d_t *clusters = NULL;
+cluster_2d_t *kmeans_2d(observation_2d_t observations[], size_t size, size_t k)
+{
+  cluster_2d_t *clusters = NULL;
 
-  if (k <= 1) {
-    clusters = (cluster_3d_t *)malloc(sizeof(cluster_3d_t));
-    memset(clusters, 0, sizeof(cluster_3d_t));
+  if (k <= 1)
+  {
+    clusters = (cluster_2d_t *) malloc(sizeof(cluster_2d_t));
+    memset(clusters, 0, sizeof(cluster_2d_t));
     calculate_centroid(observations, size, clusters);
-  } else if (k < size) {
-    clusters = malloc(sizeof(cluster_3d_t) * k);
-    memset(clusters, 0, k * sizeof(cluster_3d_t));
+  }
+  else if (k < size)
+  {
+    clusters = malloc(sizeof(cluster_2d_t) * k);
+    memset(clusters, 0, k * sizeof(cluster_2d_t));
 
-    for (size_t index = 0; index < size; index++) {
+    for (size_t index = 0; index < size; index++)
+    {
       observations[index].group = rand() % k;
     }
 
@@ -69,51 +74,59 @@ cluster_3d_t *kmeans_3d(observation_3d_t observations[], size_t size, size_t k) 
 
     size_t temp = 0;
 
-    do {
-      for (size_t index = 0; index < k; index++) {
+    do
+    {
+      for (size_t index = 0; index < k; index++)
+      {
         clusters[index].x = 0;
         clusters[index].y = 0;
-        clusters[index].z = 0;
         clusters[index].count = 0;
       }
 
-      for (size_t index = 0; index < size; index++) {
+      for (size_t index = 0; index < size; index++)
+      {
         temp = observations[index].group;
-
         clusters[temp].x += observations[index].x;
         clusters[temp].y += observations[index].y;
-        clusters[temp].z += observations[index].z;
         clusters[temp].count++;
       }
 
-      for (size_t index = 0; index < k; index++) {
+      for (size_t index = 0; index < k; index++)
+      {
         clusters[index].x /= clusters[index].count;
         clusters[index].y /= clusters[index].count;
-        clusters[index].z /= clusters[index].count;
       }
 
       changed = 0;
-      for (size_t index = 0; index < size; index++) {
+      for (size_t index = 0; index < size; index++)
+      {
         temp = calculate_nearst(observations + index, clusters, k);
 
-        if (temp != observations[index].group) {
+        if (temp != observations[index].group)
+        {
           changed++;
           observations[index].group = temp;
         }
       }
     } while (changed > min_error);
-  } else {
-    clusters = (cluster_3d_t *)malloc(sizeof(cluster_3d_t) * k);
-    memset(clusters, 0, k * sizeof(cluster_3d_t));
+  }
+  else
+  {
+    clusters = (cluster_2d_t *) malloc(sizeof(cluster_2d_t) * k);
+    memset(clusters, 0, k * sizeof(cluster_2d_t));
 
-    for (size_t index = 0; index < size; index++) {
+    for (size_t index = 0; index < size; index++)
+    {
       clusters[index].x = observations[index].x;
       clusters[index].y = observations[index].y;
-      clusters[index].z = observations[index].z;
-
       clusters[index].count = 1;
       observations[index].group = index;
     }
   }
   return clusters;
+}
+
+cluster_t *kmeans(observation_t observations[], size_t size, size_t k)
+{
+  return kmeans_2d(observations, size, k);
 }
