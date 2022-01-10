@@ -25,4 +25,4 @@ python setup.py bdist_wheel
 
 ## LICENSE
 
-This project is licensed under `LGPL-3.0-or-later`. See [LICENSE](LICENSE) for more information.
+This project is licensed under `MIT`. See [LICENSE](LICENSE) for more information.

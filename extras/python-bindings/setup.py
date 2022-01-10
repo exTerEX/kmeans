@@ -48,7 +48,7 @@ if __name__ == "__main__":
     setup(
         name="kmeans",
         version="0.1.0",
-        license="LGPL-3.0-or-later",
+        license="MIT",
         author="Andreas Sagen",
         description="A kmeans clustering algorithm implemented in C",
         long_description=long_description,
