@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-import pathlib
+from pathlib import Path
 
 from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext
@@ -18,17 +18,18 @@ class build_ext(build_ext):
         super().run()
 
     def build_cmake(self, ext):
-        cwd = pathlib.Path().absolute()
+        cwd = Path().absolute()
 
-        build_temp = pathlib.Path(self.build_temp)
+        build_temp = Path(self.build_temp)
         build_temp.mkdir(parents=True, exist_ok=True)
-        extdir = pathlib.Path(self.get_ext_fullpath(ext.name))
+        extdir = Path(self.get_ext_fullpath(ext.name))
         extdir.mkdir(parents=True, exist_ok=True)
 
         config = "Debug" if self.debug else "Release"
         cmake_args = [
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + str(extdir.parent.absolute()),
-            "-DCMAKE_BUILD_TYPE=" + config]
+            "-DCMAKE_BUILD_TYPE=" + config
+        ]
 
         build_args = ["--config", config, "--", "-j4"]
 
@@ -56,7 +57,7 @@ if __name__ == "__main__":
         package_data={
             "kmeans": ["libkmeans.so"]
         },
-        ext_modules=[CMakeExtension("kmeans")],
+        ext_modules=[CMakeExtension("kmeans/libkmeans")],
         cmdclass={"build_ext": build_ext},
         python_requires=">=3.6",
         install_requires=["numpy"]
