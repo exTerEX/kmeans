@@ -10,7 +10,7 @@
         "--max-line-length=99"
     ],
     "python.sortImports.args": [
-        "--py=310",
+        "--py=37",
         "--skip-gitignore"
     ],
     "cmakeFormat.args": [
@@ -19,5 +19,6 @@
         "--command-case=upper",
         "--line-ending=unix",
         "--line-width=100"
-    ]
+    ],
+    "cmake.configureOnEdit": false
 }
