@@ -1,34 +1,53 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1 FATAL_ERROR)
 
-project(kmeans LANGUAGES C)
+# Download submodule on configuration
+FIND_PACKAGE(Git QUIET)
+IF(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+  EXECUTE_PROCESS(
+    COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    RESULT_VARIABLE GIT_SUBMOD_RESULT)
 
-include_directories(include)
+  IF(NOT GIT_SUBMOD_RESULT EQUAL "0")
+    MESSAGE(
+      FATAL_ERROR
+        "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules"
+    )
+  ENDIF(NOT GIT_SUBMOD_RESULT EQUAL "0")
+ENDIF(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED True)
+INCLUDE(cmake/munkei-cmake/Munkei.cmake)
+INCLUDE(MunkeiVersionFromGit)
 
-find_library(MATH_LIBRARY m REQUIRED)
+# Get versioning information from the git repostiry
+VERSION_FROM_GIT()
 
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
-endif ()
+PROJECT(
+  kmeans
+  VERSION ${VERSION}
+  LANGUAGES C)
+
+INCLUDE_DIRECTORIES(include)
+
+SET(CMAKE_C_STANDARD 11)
+SET(CMAKE_C_STANDARD_REQUIRED True)
+
+FIND_LIBRARY(MATH_LIBRARY m REQUIRED)
+
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 # library
-add_library(${PROJECT_NAME} SHARED src/2d.c src/3d.c)
-target_include_directories(
-  ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-                         $<INSTALL_INTERFACE:include>)
-set_target_properties(
-  ${PROJECT_NAME}
-  PROPERTIES LINKER_LANGUAGE C
-             C_STANDARD 11)
+ADD_LIBRARY(${PROJECT_NAME} SHARED src/2d.c src/3d.c)
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+                                                  $<INSTALL_INTERFACE:include>)
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C C_STANDARD 11)
 
 # executable
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-  add_executable(main examples/main.c)
-  set_target_properties(main PROPERTIES LINKER_LANGUAGE C C_STANDARD 11)
+IF("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+  ADD_EXECUTABLE(main examples/main.c)
+  SET_TARGET_PROPERTIES(main PROPERTIES LINKER_LANGUAGE C C_STANDARD 11)
 
-  if (MATH_LIBRARY)
-    target_link_libraries(main ${PROJECT_NAME} ${MATH_LIBRARY})
-  endif ()
-endif ()
+  IF(MATH_LIBRARY)
+    TARGET_LINK_LIBRARIES(main ${PROJECT_NAME} ${MATH_LIBRARY})
+  ENDIF(MATH_LIBRARY)
+ENDIF("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
