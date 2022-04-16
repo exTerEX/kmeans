@@ -12,5 +12,12 @@
     "python.sortImports.args": [
         "--py=310",
         "--skip-gitignore"
+    ],
+    "cmakeFormat.args": [
+        "--enable-sort",
+        "--keyword-case=upper",
+        "--command-case=upper",
+        "--line-ending=unix",
+        "--line-width=100"
     ]
 }
