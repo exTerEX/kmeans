@@ -1,14 +1,14 @@
 from ctypes import *
 from typing import *
-from pathlib import Path
-
+import pathlib
 from numpy import array, cos, ndarray, pi, random, sin, zeros, tan
 
+so_path = pathlib.Path(__file__).glob("*.so")
+
 try:
-    lib = cdll.LoadLibrary(str(Path(__file__).with_name("libkmeans.so")))
+    lib = cdll.LoadLibrary(str(so_path))
 except Exception as E:
-    print(f"Cannot load DLL")
-    print(E)
+    print(f"Cannot load DLL {E}")
 
 
 class observation_2d(Structure):
