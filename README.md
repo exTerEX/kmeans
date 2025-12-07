@@ -1,28 +1,58 @@
-# K-Means Clustering
+# KMeans
 
-A simple C implementation of K-Means clustering with bindings to Python and R.
+A fast k-means clustering algorithm implemented in C with Python bindings.
 
-## Get started
+## Installation
 
-### Requirements
+### Using UV (recommended)
 
-- GCC/Clang
-- CMake 3.1+
-- Python 3.6+ w/ numpy (optional)
-- R 4.0+ (optional)
-
-### Install directly
-
-```sh
-python -m pip install .
+```bash
+uv pip install .
 ```
 
-### Build wheel
+### Using pip
 
-```sh
-python setup.py bdist_wheel
+```bash
+pip install .
 ```
 
-## LICENSE
+### Development installation
 
-This project is licensed under `MIT`. See [LICENSE](LICENSE) for more information.
+```bash
+uv pip install -e ".[dev]"
+```
+
+## Quick Start
+
+```python
+import numpy as np
+from kmeans import KMeans, kmeans
+
+# Generate sample data
+np.random.seed(42)
+data = np.vstack([
+    np.random.randn(100, 2) + [0, 0],
+    np.random.randn(100, 2) + [5, 5],
+    np.random.randn(100, 2) + [10, 0],
+])
+
+# Using the functional API
+centroids, labels = kmeans(data, k=3)
+
+# Using the class-based API
+model = KMeans(n_clusters=3)
+model.fit(data)
+predictions = model.predict(data)
+```
+
+## Features
+
+* Fast k-means clustering with C implementation
+* K-means++ initialization
+* NumPy integration
+* Scikit-learn compatible API
+* Support for arbitrary dimensions
+
+## License
+
+MIT

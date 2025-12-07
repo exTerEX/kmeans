@@ -26,7 +26,6 @@ CMakeCache.txt
 CMakeFiles
 CMakeScripts
 Testing
-Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
@@ -273,3 +272,40 @@ po/*~
 
 # R package: bookdown caching files
 /*_files/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.so
+*.pyd
+*.dylib
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# UV
+.uv/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Coverage
+.coverage
+htmlcov/

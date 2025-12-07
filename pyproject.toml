@@ -1,31 +1,104 @@
-[build-system]
-requires = ["setuptools>=51.0.0", "wheel>=0.29.0", "setuptools-git-versioning"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools-git-versioning]
-enabled = true
-
-[bdist_wheel]
-universal = 1
-
-[tool.pyright]
-exclude = ["**/__pycache__"]
-reportMissingImports = false
-reportMissingModuleSource = false
-pythonVersion = "3.7"
-
-[tool.pylint.master]
-ignore = ["__init__.py", "__pycache__"]
-jobs = 0
-persistent = "yes"
-
-[tool.pylint.messages_control]
-disable = [
-    "too-many-arguments",
-    "too-many-locals",
-    "too-many-branches",
-    "too-many-statements",
+[project]
+name = "kmeans"
+version = "v0.1.0"
+description = "A kmeans clustering algorithm implemented in C"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Andreas Sagen"}
+]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.20.0,<2.0; python_version < '3.12'",
+    "numpy>=1.26.0; python_version >= '3.12'",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: C",
 ]
 
-[tool.isort]
-multi_line_output = 5
+[build-system]
+requires = ["scikit-build-core>=0.5", "numpy"]
+build-backend = "scikit_build_core.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1.0",
+    "sphinx>=5.0",
+    "sphinx-rtd-theme>=1.0",
+    "breathe>=4.35",
+    "myst-parser>=1.0",
+]
+
+[tool.scikit-build]
+cmake.version = ">=3.15"
+wheel.packages = ["src/kmeans"]
+build-dir = "build/{wheel_tag}"
+
+[tool.scikit-build.cmake.define]
+CMAKE_BUILD_TYPE = "Release"
+
+#[tool.uv.extra-build-dependencies]
+#kmeans = ["scikit_build_core"]
+
+[tool.ruff]
+respect-gitignore = true
+line-length = 79
+indent-width = 4
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 79
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.isort]
+section-order = [
+  "future",
+  "standard-library",
+  "first-party",
+  "local-folder",
+  "third-party",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"
+
+[tool.coverage.run]
+source = ["src/kmeans"]
+omit = ["*/tests/*", "*/test_*.py", "*/_kmeans*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "except ImportError",
+]
+fail_under = 0
+show_missing = true

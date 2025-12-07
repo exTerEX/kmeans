@@ -1,59 +1,65 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15)
 
-# Download submodule on configuration
-FIND_PACKAGE(Git QUIET)
-IF(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-  EXECUTE_PROCESS(
-    COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    RESULT_VARIABLE GIT_SUBMOD_RESULT)
+project(kmeans VERSION 0.1.0 LANGUAGES C)
 
-  IF(NOT GIT_SUBMOD_RESULT EQUAL "0")
-    MESSAGE(
-      FATAL_ERROR
-        "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules"
-    )
-  ENDIF(NOT GIT_SUBMOD_RESULT EQUAL "0")
-ENDIF(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
-INCLUDE(cmake/munkei-cmake/Munkei.cmake)
-INCLUDE(MunkeiVersionFromGit)
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module NumPy)
 
-# Get versioning information from the git repostiry
-VERSION_FROM_GIT()
+include_directories(include)
 
-PROJECT(
-  kmeans
-  VERSION ${VERSION}
-  LANGUAGES C)
+find_library(MATH_LIBRARY m)
 
-INCLUDE_DIRECTORIES(include)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
-SET(CMAKE_C_STANDARD 11)
-SET(CMAKE_C_STANDARD_REQUIRED True)
+# Shared library for C API (optional, for non-Python usage)
+if(EXISTS "${CMAKE_SOURCE_DIR}/src/2d.c" AND EXISTS "${CMAKE_SOURCE_DIR}/src/3d.c")
+  add_library(${PROJECT_NAME}_lib SHARED src/2d.c src/3d.c)
+  target_include_directories(${PROJECT_NAME}_lib PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+  )
+  set_target_properties(${PROJECT_NAME}_lib PROPERTIES 
+    LINKER_LANGUAGE C
+    C_STANDARD 11
+    OUTPUT_NAME "kmeans"
+  )
+  if(MATH_LIBRARY)
+    target_link_libraries(${PROJECT_NAME}_lib ${MATH_LIBRARY})
+  endif()
+endif()
 
-FIND_LIBRARY(MATH_LIBRARY m REQUIRED)
+# Debug executable
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND EXISTS "${CMAKE_SOURCE_DIR}/examples/main.c")
+  add_executable(main examples/main.c)
+  set_target_properties(main PROPERTIES LINKER_LANGUAGE C C_STANDARD 11)
+  if(TARGET ${PROJECT_NAME}_lib)
+    target_link_libraries(main ${PROJECT_NAME}_lib)
+  endif()
+  if(MATH_LIBRARY)
+    target_link_libraries(main ${MATH_LIBRARY})
+  endif()
+endif()
 
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+# Python extension module
+python_add_library(_kmeans MODULE
+    src/kmeans/_kmeans.c
+    WITH_SOABI
+)
 
-# library
-ADD_LIBRARY(${PROJECT_NAME} SHARED src/2d.c src/3d.c)
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-                                                  $<INSTALL_INTERFACE:include>)
-SET_TARGET_PROPERTIES(
-  ${PROJECT_NAME}
-  PROPERTIES LINKER_LANGUAGE C
-             C_STANDARD 11
-             PREFIX "")
+target_include_directories(_kmeans PRIVATE
+    ${Python_NumPy_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/include
+)
 
-# executable
-IF("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-  ADD_EXECUTABLE(main examples/main.c)
-  SET_TARGET_PROPERTIES(main PROPERTIES LINKER_LANGUAGE C C_STANDARD 11)
+target_link_libraries(_kmeans PRIVATE Python::NumPy)
 
-  IF(MATH_LIBRARY)
-    TARGET_LINK_LIBRARIES(main ${PROJECT_NAME} ${MATH_LIBRARY})
-  ENDIF(MATH_LIBRARY)
-ENDIF("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+if(MATH_LIBRARY)
+  target_link_libraries(_kmeans PRIVATE ${MATH_LIBRARY})
+endif()
+
+# Install the extension module
+install(TARGETS _kmeans DESTINATION kmeans)
