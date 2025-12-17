@@ -2,19 +2,22 @@
 
 import os
 import sys
-import re
+import tomllib
 from unittest.mock import MagicMock
 
 sys.path.insert(0, os.path.abspath('../src'))
 
+
+
 def get_version():
-    """Extract version from __init__.py"""
-    init_file = os.path.join(os.path.dirname(__file__), "../src/kmeans/__init__.py")
-    with open(init_file, "r") as f:
-        content = f.read()
-        match = re.search(r'__version__\s*=\s*["\']([^"\']+)["\']', content)
-        if match:
-            return match.group(1)
+    """Load version from pyproject.toml"""
+    pyproject_path = os.path.join(
+        os.path.dirname(__file__), "..", "pyproject.toml"
+    )
+    with open(pyproject_path, "rb") as f:
+        pyproject_data = tomllib.load(f)
+
+        return pyproject_data.get("project", {}).get("version", "unknown")
 
 
 # Mock the C extension module to avoid import errors during doc build
